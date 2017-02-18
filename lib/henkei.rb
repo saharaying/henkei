@@ -37,16 +37,17 @@ class Henkei
   end
 
   def self._client_read(type, data)
-    switch = case type
-    when :text
-      '-t'
-    when :html
-      '-h'
-    when :metadata
-      '-m -j'
-    when :mimetype
-      '-m -j'
-    end
+    switch =
+      case type
+      when :text
+        '-t'
+      when :html
+        '-h'
+      when :metadata
+        '-m -j'
+      when :mimetype
+        '-m -j'
+      end
 
     IO.popen "#{java} -Djava.awt.headless=true -jar #{Henkei::JARPATH} #{switch}", 'r+' do |io|
       io.write data
@@ -150,7 +151,7 @@ class Henkei
   def mimetype
     return @mimetype if defined? @mimetype
 
-    type = metadata["Content-Type"].is_a?(Array) ? metadata["Content-Type"].first : metadata["Content-Type"]
+    type = metadata['Content-Type'].is_a?(Array) ? metadata['Content-Type'].first : metadata['Content-Type']
     
     @mimetype = MIME::Types[type].first
   end
@@ -221,16 +222,17 @@ class Henkei
   #  Henkei.server(:text, 9294)
   #
   def self.server(type, custom_port=nil)
-    switch = case type
-    when :text
-      '-t'
-    when :html
-      '-h'
-    when :metadata
-      '-m -j'
-    when :mimetype
-      '-m -j'
-    end
+    switch =
+      case type
+      when :text
+        '-t'
+      when :html
+        '-h'
+      when :metadata
+        '-m -j'
+      when :mimetype
+        '-m -j'
+      end
 
     @@server_port = custom_port || DEFAULT_SERVER_PORT
     

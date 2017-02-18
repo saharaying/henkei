@@ -122,7 +122,7 @@ describe Henkei do
     end
 
     specify '#metadata reads metadata' do
-      expect( henkei.metadata['Content-Type'] ).to eql ["application/vnd.apple.pages", "application/vnd.apple.pages"]
+      expect( henkei.metadata['Content-Type'] ).to eql ['application/vnd.apple.pages', 'application/vnd.apple.pages']
     end
   end
 
@@ -146,7 +146,7 @@ describe Henkei do
     end
 
     specify '#metadata reads metadata' do
-      expect( henkei.metadata['Content-Type'] ).to eql ["application/vnd.apple.pages", "application/vnd.apple.pages"]
+      expect( henkei.metadata['Content-Type'] ).to eql ['application/vnd.apple.pages', 'application/vnd.apple.pages']
     end
   end
 
