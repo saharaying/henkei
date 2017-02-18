@@ -1,3 +1,3 @@
 class Henkei
-  VERSION = '0.2.4'
+  VERSION = '1.14.1'
 end
