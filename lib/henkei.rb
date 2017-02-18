@@ -1,4 +1,5 @@
 require 'henkei/version'
+require 'henkei/yomu'
 
 require 'net/http'
 require 'mime/types'
