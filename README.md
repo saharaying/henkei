@@ -33,6 +33,12 @@ metadata = Henkei.read :metadata, data
 mimetype = Henkei.read :mimetype, data
 ```
 
+Henkei is backward compatible with Yomu
+
+```ruby
+text = Yomu.read :text, data
+```
+
 ### Reading text from a given filename
 
 Create a new instance of Henkei and pass a filename.
