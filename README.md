@@ -6,6 +6,8 @@
 
 [Henkei](http://github.com/abrom/henkei) is a library for extracting text and metadata from files and documents using the [Apache Tika](http://tika.apache.org/) content analysis toolkit.
 
+The library was forked from [Yomu](http://github.com/Erol/yomu) as it is no longer maintained.
+
 Here are some of the formats supported:
 
 - Microsoft Office OLE 2 and Office Open XML Formats (.doc, .docx, .xls, .xlsx,
