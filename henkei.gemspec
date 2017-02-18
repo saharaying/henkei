@@ -1,16 +1,16 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'yomu/version'
+require 'henkei/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'yomu'
-  spec.version       = Yomu::VERSION
-  spec.authors       = ['Erol Fornoles']
-  spec.email         = ['erol.fornoles@gmail.com']
+  spec.name          = 'henkei'
+  spec.version       = Henkei::VERSION
+  spec.authors       = ['Erol Fornoles', 'Andrew Bromwich']
+  spec.email         = ['erol.fornoles@gmail.com', 'a.bromwich@gmail.com']
   spec.description   = %q{Read text and metadata from files and documents (.doc, .docx, .pages, .odt, .rtf, .pdf)}
   spec.summary       = %q{Read text and metadata from files and documents (.doc, .docx, .pages, .odt, .rtf, .pdf)}
-  spec.homepage      = 'http://erol.github.com/yomu'
+  spec.homepage      = 'http://github.com/abrom/henkei'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)

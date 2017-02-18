@@ -1,4 +1,7 @@
-Textract
+Henkei
+Copyright 2017 Andrew Bromwich, released under the MIT license
+
+Yomu
 Copyright 2011 Erol Fornoles, released under the MIT license
 
 Apache Tika

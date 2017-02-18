@@ -1,4 +1,4 @@
-require 'yomu/version'
+require 'henkei/version'
 
 require 'net/http'
 require 'mime/types'
@@ -7,9 +7,9 @@ require 'json'
 require 'socket'
 require 'stringio'
 
-class Yomu
+class Henkei
   GEMPATH = File.dirname(File.dirname(__FILE__))
-  JARPATH = File.join(Yomu::GEMPATH, 'jar', 'tika-app-1.11.jar')
+  JARPATH = File.join(Henkei::GEMPATH, 'jar', 'tika-app-1.11.jar')
   DEFAULT_SERVER_PORT = 9293 # an arbitrary, but perfectly cromulent, port
 
   @@server_port = nil
@@ -18,8 +18,8 @@ class Yomu
   # Read text or metadata from a data buffer.
   #
   #   data = File.read 'sample.pages'
-  #   text = Yomu.read :text, data
-  #   metadata = Yomu.read :metadata, data
+  #   text = Henkei.read :text, data
+  #   metadata = Henkei.read :metadata, data
 
   def self.read(type, data)
     result = @@server_pid ? self._server_read(type, data) : self._client_read(type, data)
@@ -48,7 +48,7 @@ class Yomu
       '-m -j'
     end
 
-    IO.popen "#{java} -Djava.awt.headless=true -jar #{Yomu::JARPATH} #{switch}", 'r+' do |io|
+    IO.popen "#{java} -Djava.awt.headless=true -jar #{Henkei::JARPATH} #{switch}", 'r+' do |io|
       io.write data
       io.close_write
       io.read
@@ -78,19 +78,19 @@ class Yomu
     resp
   end
 
-  # Create a new instance of Yomu with a given document.
+  # Create a new instance of Henkei with a given document.
   #
   # Using a file path:
   #
-  #   Yomu.new 'sample.pages'
+  #   Henkei.new 'sample.pages'
   #
   # Using a URL:
   #
-  #   Yomu.new 'http://svn.apache.org/repos/asf/poi/trunk/test-data/document/sample.docx'
+  #   Henkei.new 'http://svn.apache.org/repos/asf/poi/trunk/test-data/document/sample.docx'
   #
   # From a stream or an object which responds to +read+
   #
-  #   Yomu.new File.open('sample.pages')
+  #   Henkei.new File.open('sample.pages')
 
   def initialize(input)
     if input.is_a? String
@@ -108,44 +108,44 @@ class Yomu
     end
   end
 
-  # Returns the text content of the Yomu document.
+  # Returns the text content of the Henkei document.
   #
-  #   yomu = Yomu.new 'sample.pages'
-  #   yomu.text
+  #   henkei = Henkei.new 'sample.pages'
+  #   henkei.text
 
   def text
     return @text if defined? @text
 
-    @text = Yomu.read :text, data
+    @text = Henkei.read :text, data
   end
 
-  # Returns the text content of the Yomu document in HTML.
+  # Returns the text content of the Henkei document in HTML.
   #
-  #   yomu = Yomu.new 'sample.pages'
-  #   yomu.html
+  #   henkei = Henkei.new 'sample.pages'
+  #   henkei.html
 
   def html
     return @html if defined? @html
 
-    @html = Yomu.read :html, data
+    @html = Henkei.read :html, data
   end
 
-  # Returns the metadata hash of the Yomu document.
+  # Returns the metadata hash of the Henkei document.
   #
-  #   yomu = Yomu.new 'sample.pages'
-  #   yomu.metadata['Content-Type']
+  #   henkei = Henkei.new 'sample.pages'
+  #   henkei.metadata['Content-Type']
 
   def metadata
     return @metadata if defined? @metadata
 
-    @metadata = Yomu.read :metadata, data
+    @metadata = Henkei.read :metadata, data
   end
 
-  # Returns the mimetype object of the Yomu document.
+  # Returns the mimetype object of the Henkei document.
   #
-  #   yomu = Yomu.new 'sample.docx'
-  #   yomu.mimetype.content_type #=> 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-  #   yomu.mimetype.extensions #=> ['docx']
+  #   henkei = Henkei.new 'sample.docx'
+  #   henkei.mimetype.content_type #=> 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  #   henkei.mimetype.extensions #=> ['docx']
 
   def mimetype
     return @mimetype if defined? @mimetype
@@ -155,10 +155,10 @@ class Yomu
     @mimetype = MIME::Types[type].first
   end
 
-  # Returns +true+ if the Yomu document was specified using a file path.
+  # Returns +true+ if the Henkei document was specified using a file path.
   #
-  #   yomu = Yomu.new 'sample.pages'
-  #   yomu.path? #=> true
+  #   henkei = Henkei.new 'sample.pages'
+  #   henkei.path? #=> true
 
 
   def creation_date
@@ -175,29 +175,29 @@ class Yomu
     defined? @path
   end
 
-  # Returns +true+ if the Yomu document was specified using a URI.
+  # Returns +true+ if the Henkei document was specified using a URI.
   #
-  #   yomu = Yomu.new 'http://svn.apache.org/repos/asf/poi/trunk/test-data/document/sample.docx'
-  #   yomu.uri? #=> true
+  #   henkei = Henkei.new 'http://svn.apache.org/repos/asf/poi/trunk/test-data/document/sample.docx'
+  #   henkei.uri? #=> true
 
   def uri?
     defined? @uri
   end
 
-  # Returns +true+ if the Yomu document was specified from a stream or an object which responds to +read+.
+  # Returns +true+ if the Henkei document was specified from a stream or an object which responds to +read+.
   #
   #   file = File.open('sample.pages')
-  #   yomu = Yomu.new file
-  #   yomu.stream? #=> true
+  #   henkei = Henkei.new file
+  #   henkei.stream? #=> true
 
   def stream?
     defined? @stream
   end
 
-  # Returns the raw/unparsed content of the Yomu document.
+  # Returns the raw/unparsed content of the Henkei document.
   #
-  #   yomu = Yomu.new 'sample.pages'
-  #   yomu.data
+  #   henkei = Henkei.new 'sample.pages'
+  #   henkei.data
 
   def data
     return @data if defined? @data
@@ -218,7 +218,7 @@ class Yomu
   #  type :html, :text or :metadata
   #  custom_port e.g. 9293
   #   
-  #  Yomu.server(:text, 9294)
+  #  Henkei.server(:text, 9294)
   #
   def self.server(type, custom_port=nil)
     switch = case type
@@ -234,24 +234,24 @@ class Yomu
 
     @@server_port = custom_port || DEFAULT_SERVER_PORT
     
-    @@server_pid = Process.spawn("#{java} -Djava.awt.headless=true -jar #{Yomu::JARPATH} --server --port #{@@server_port} #{switch}")
+    @@server_pid = Process.spawn("#{java} -Djava.awt.headless=true -jar #{Henkei::JARPATH} --server --port #{@@server_port} #{switch}")
     sleep(2) # Give the server 2 seconds to spin up.
     @@server_pid
   end
 
-  # Kills server started by Yomu.server
+  # Kills server started by Henkei.server
   # 
   #  Always run this when you're done, or else Tika might run until you kill it manually
   #  You might try putting your extraction in a begin..rescue...ensure...end block and
   #    putting this method in the ensure block.
   #
-  #  Yomu.server(:text)
+  #  Henkei.server(:text)
   #  reports = ["report1.docx", "report2.doc", "report3.pdf"]
   #  begin
-  #    my_texts = reports.map{|report_path| Yomu.new(report_path).text }
+  #    my_texts = reports.map{|report_path| Henkei.new(report_path).text }
   #  rescue
   #  ensure
-  #    Yomu.kill_server!
+  #    Henkei.kill_server!
   #  end
   def self.kill_server!
     if @@server_pid
