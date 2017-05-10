@@ -22,9 +22,9 @@ class Henkei
   #   data = File.read 'sample.pages'
   #   text = Henkei.read :text, data
   #   metadata = Henkei.read :metadata, data
-
+  #
   def self.read(type, data)
-    result = @@server_pid ? self._server_read(type, data) : self._client_read(type, data)
+    result = @@server_pid ? server_read(type, data) : client_read(type, data)
 
     case type
     when :text
@@ -36,49 +36,6 @@ class Henkei
     when :mimetype
       MIME::Types[JSON.parse(result)['Content-Type']].first
     end
-  end
-
-  def self._client_read(type, data)
-    switch =
-      case type
-      when :text
-        '-t'
-      when :html
-        '-h'
-      when :metadata
-        '-m -j'
-      when :mimetype
-        '-m -j'
-      end
-
-    IO.popen "#{java} -Djava.awt.headless=true -jar #{Henkei::JARPATH} #{switch}", 'r+' do |io|
-      io.write data
-      io.close_write
-      io.read
-    end
-  end
-
-
-  def self._server_read(_, data)
-    s = TCPSocket.new('localhost', @@server_port)
-    file = StringIO.new(data, 'r')
-
-    while 1
-      chunk = file.read(65536)
-      break unless chunk
-      s.write(chunk)
-    end
-
-    # tell Tika that we're done sending data
-    s.shutdown(Socket::SHUT_WR)
-
-    resp = ''
-    while 1
-      chunk = s.recv(65536)
-      break if chunk.empty? || !chunk
-      resp << chunk
-    end
-    resp
   end
 
   # Create a new instance of Henkei with a given document.
@@ -94,7 +51,7 @@ class Henkei
   # From a stream or an object which responds to +read+
   #
   #   Henkei.new File.open('sample.pages')
-
+  #
   def initialize(input)
     if input.is_a? String
       if File.exists? input
@@ -115,7 +72,7 @@ class Henkei
   #
   #   henkei = Henkei.new 'sample.pages'
   #   henkei.text
-
+  #
   def text
     return @text if defined? @text
 
@@ -126,7 +83,7 @@ class Henkei
   #
   #   henkei = Henkei.new 'sample.pages'
   #   henkei.html
-
+  #
   def html
     return @html if defined? @html
 
@@ -137,7 +94,7 @@ class Henkei
   #
   #   henkei = Henkei.new 'sample.pages'
   #   henkei.metadata['Content-Type']
-
+  #
   def metadata
     return @metadata if defined? @metadata
 
@@ -149,7 +106,7 @@ class Henkei
   #   henkei = Henkei.new 'sample.docx'
   #   henkei.mimetype.content_type #=> 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
   #   henkei.mimetype.extensions #=> ['docx']
-
+  #
   def mimetype
     return @mimetype if defined? @mimetype
 
@@ -162,8 +119,7 @@ class Henkei
   #
   #   henkei = Henkei.new 'sample.pages'
   #   henkei.path? #=> true
-
-
+  #
   def creation_date
     return @creation_date if defined? @creation_date
  
@@ -174,17 +130,22 @@ class Henkei
     end
   end
 
+  # Returns +true+ if the Henkei document was specified using a file path.
+  #
+  #   henkei = Henkei.new '/my/document/path/sample.docx'
+  #   henkei.path? #=> true
+  #
   def path?
-    defined? @path
+    !!@path
   end
 
   # Returns +true+ if the Henkei document was specified using a URI.
   #
   #   henkei = Henkei.new 'http://svn.apache.org/repos/asf/poi/trunk/test-data/document/sample.docx'
   #   henkei.uri? #=> true
-
+  #
   def uri?
-    defined? @uri
+    !!@uri
   end
 
   # Returns +true+ if the Henkei document was specified from a stream or an object which responds to +read+.
@@ -192,16 +153,16 @@ class Henkei
   #   file = File.open('sample.pages')
   #   henkei = Henkei.new file
   #   henkei.stream? #=> true
-
+  #
   def stream?
-    defined? @stream
+    !!@stream
   end
 
   # Returns the raw/unparsed content of the Henkei document.
   #
   #   henkei = Henkei.new 'sample.pages'
   #   henkei.data
-
+  #
   def data
     return @data if defined? @data
 
@@ -257,6 +218,7 @@ class Henkei
   #  ensure
   #    Henkei.kill_server!
   #  end
+  #
   def self.kill_server!
     if @@server_pid
       Process.kill('INT', @@server_pid)
@@ -265,8 +227,60 @@ class Henkei
     end
   end
 
+  ### Private class methods
+
+  # Provide the path to the Java binary
+  #
   def self.java
     ENV['JAVA_HOME'] ? ENV['JAVA_HOME'] + '/bin/java' : 'java'
   end
   private_class_method :java
+
+  # Internal helper for calling to Tika library directly
+  #
+  def self.client_read(type, data)
+    switch =
+      case type
+        when :text
+          '-t'
+        when :html
+          '-h'
+        when :metadata
+          '-m -j'
+        when :mimetype
+          '-m -j'
+      end
+
+    IO.popen "#{java} -Djava.awt.headless=true -jar #{Henkei::JARPATH} #{switch}", 'r+' do |io|
+      io.write data
+      io.close_write
+      io.read
+    end
+  end
+  private_class_method :client_read
+
+  # Internal helper for calling to running Tika server
+  #
+  def self.server_read(_, data)
+    s = TCPSocket.new('localhost', @@server_port)
+    file = StringIO.new(data, 'r')
+
+    while 1
+      chunk = file.read(65536)
+      break unless chunk
+      s.write(chunk)
+    end
+
+    # tell Tika that we're done sending data
+    s.shutdown(Socket::SHUT_WR)
+
+    resp = ''
+    while 1
+      chunk = s.recv(65536)
+      break if chunk.empty? || !chunk
+      resp << chunk
+    end
+    resp
+  end
+  private_class_method :server_read
 end
