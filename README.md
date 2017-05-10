@@ -92,6 +92,7 @@ henkei.mimetype.extensions #=> ['docx']
 ### Java Runtime
 
 Henkei packages the Apache Tika application jar and requires a working JRE for it to work.
+Check that you either have the `JAVA_HOME` environment variable set, or that `java` is in your path. 
 
 ### Gem
 
