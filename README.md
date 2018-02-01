@@ -1,5 +1,6 @@
 [![Travis Build Status](http://img.shields.io/travis/abrom/henkei.svg?style=flat)](https://travis-ci.org/abrom/henkei)
-[![Code Climate Score](http://img.shields.io/codeclimate/github/abrom/henkei.svg?style=flat)](https://codeclimate.com/github/abrom/henkei)
+[![Maintainability](https://api.codeclimate.com/v1/badges/d06e8c917cf7d8c07234/maintainability)](https://codeclimate.com/github/abrom/henkei/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/d06e8c917cf7d8c07234/test_coverage)](https://codeclimate.com/github/abrom/henkei/test_coverage)
 [![Gem Version](http://img.shields.io/gem/v/henkei.svg?style=flat)](#)
 
 # Henkei 変形
