@@ -11,7 +11,7 @@ require 'stringio'
 
 class Henkei
   GEMPATH = File.dirname(File.dirname(__FILE__))
-  JARPATH = File.join(Henkei::GEMPATH, 'jar', 'tika-app-1.14.jar')
+  JARPATH = File.join(Henkei::GEMPATH, 'jar', 'tika-app-1.15.jar')
   DEFAULT_SERVER_PORT = 9293 # an arbitrary, but perfectly cromulent, port
 
   @@server_port = nil
