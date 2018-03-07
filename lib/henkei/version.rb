@@ -1,3 +1,3 @@
 class Henkei
-  VERSION = '1.17.3'
+  VERSION = '1.17.3'.freeze
 end

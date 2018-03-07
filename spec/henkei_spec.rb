@@ -12,27 +12,27 @@ describe Henkei do
     it 'reads text' do
       text = Henkei.read :text, data
 
-      expect( text ).to include 'The quick brown fox jumped over the lazy cat.'
+      expect(text).to include 'The quick brown fox jumped over the lazy cat.'
     end
 
     it 'reads metadata' do
       metadata = Henkei.read :metadata, data
 
-      expect( metadata['Content-Type'] ).to eql 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      expect(metadata['Content-Type']).to eql 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     end
 
     it 'reads metadata values with colons as strings' do
       data = File.read 'spec/samples/sample-metadata-values-with-colons.doc'
       metadata = Henkei.read :metadata, data
 
-      expect( metadata['dc:title'] ).to eql 'problem: test'
+      expect(metadata['dc:title']).to eql 'problem: test'
     end
 
     it 'reads mimetype' do
       mimetype = Henkei.read :mimetype, data
 
-      expect( mimetype.content_type ).to eql 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-      expect( mimetype.extensions ).to include 'docx'
+      expect(mimetype.content_type).to eql 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      expect(mimetype.extensions).to include 'docx'
     end
   end
 
@@ -44,47 +44,47 @@ describe Henkei do
     it 'accepts a root path' do
       henkei = Henkei.new 'spec/samples/sample.pages'
 
-      expect( henkei ).to be_path
-      expect( henkei ).not_to be_uri
-      expect( henkei ).not_to be_stream
+      expect(henkei).to be_path
+      expect(henkei).not_to be_uri
+      expect(henkei).not_to be_stream
     end
 
     it 'accepts a relative path' do
       henkei = Henkei.new 'spec/samples/sample.pages'
 
-      expect( henkei ).to be_path
-      expect( henkei ).not_to be_uri
-      expect( henkei ).not_to be_stream
+      expect(henkei).to be_path
+      expect(henkei).not_to be_uri
+      expect(henkei).not_to be_stream
     end
 
     it 'accepts a path with spaces' do
       henkei = Henkei.new 'spec/samples/sample filename with spaces.pages'
 
-      expect( henkei ).to be_path
-      expect( henkei ).not_to be_uri
-      expect( henkei ).not_to be_stream
+      expect(henkei).to be_path
+      expect(henkei).not_to be_uri
+      expect(henkei).not_to be_stream
     end
 
     it 'accepts a URI' do
       henkei = Henkei.new 'http://svn.apache.org/repos/asf/poi/trunk/test-data/document/sample.docx'
 
-      expect( henkei ).to be_uri
-      expect( henkei ).not_to be_path
-      expect( henkei ).not_to be_stream
+      expect(henkei).to be_uri
+      expect(henkei).not_to be_path
+      expect(henkei).not_to be_stream
     end
 
     it 'accepts a stream or object that can be read' do
       File.open 'spec/samples/sample.pages', 'r' do |file|
         henkei = Henkei.new file
 
-        expect( henkei ).to be_stream
-        expect( henkei ).not_to be_path
-        expect( henkei ).not_to be_uri
+        expect(henkei).to be_stream
+        expect(henkei).not_to be_path
+        expect(henkei).not_to be_uri
       end
     end
 
     it 'refuses a path to a missing file' do
-      expect { Henkei.new 'test/sample/missing.pages'}.to raise_error Errno::ENOENT
+      expect { Henkei.new 'test/sample/missing.pages' }.to raise_error Errno::ENOENT
     end
 
     it 'refuses other objects' do
@@ -94,23 +94,22 @@ describe Henkei do
     end
   end
 
-
   describe '.creation_date' do
     let(:henkei) { Henkei.new 'spec/samples/sample.pages' }
     it 'should return Time' do
-      expect( henkei.creation_date ).to be_a Time
+      expect(henkei.creation_date).to be_a Time
     end
   end
 
   describe '.java' do
     specify 'with no specified JAVA_HOME' do
-      expect( Henkei.send(:java_path) ).to eql 'java'
+      expect(Henkei.send(:java_path)).to eql 'java'
     end
 
     specify 'with a specified JAVA_HOME' do
       ENV['JAVA_HOME'] = '/path/to/java/home'
 
-      expect( Henkei.send(:java_path) ).to eql '/path/to/java/home/bin/java'
+      expect(Henkei.send(:java_path)).to eql '/path/to/java/home/bin/java'
     end
   end
 
@@ -118,11 +117,11 @@ describe Henkei do
     let(:henkei) { Henkei.new 'spec/samples/sample.pages' }
 
     specify '#text reads text' do
-      expect( henkei.text).to include 'The quick brown fox jumped over the lazy cat.'
+      expect(henkei.text).to include 'The quick brown fox jumped over the lazy cat.'
     end
 
     specify '#metadata reads metadata' do
-      expect( henkei.metadata['Content-Type'] ).to eql ['application/vnd.apple.pages', 'application/vnd.apple.pages']
+      expect(henkei.metadata['Content-Type']).to eql ['application/vnd.apple.pages', 'application/vnd.apple.pages']
     end
   end
 
@@ -130,11 +129,11 @@ describe Henkei do
     let(:henkei) { Henkei.new 'http://svn.apache.org/repos/asf/poi/trunk/test-data/document/sample.docx' }
 
     specify '#text reads text' do
-      expect( henkei.text ).to include 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.'
+      expect(henkei.text).to include 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.'
     end
 
     specify '#metadata reads metadata' do
-      expect( henkei.metadata['Content-Type'] ).to eql 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      expect(henkei.metadata['Content-Type']).to eql 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     end
   end
 
@@ -142,11 +141,11 @@ describe Henkei do
     let(:henkei) { Henkei.new File.open('spec/samples/sample.pages', 'rb') }
 
     specify '#text reads text' do
-      expect( henkei.text ).to include 'The quick brown fox jumped over the lazy cat.'
+      expect(henkei.text).to include 'The quick brown fox jumped over the lazy cat.'
     end
 
     specify '#metadata reads metadata' do
-      expect( henkei.metadata['Content-Type'] ).to eql ['application/vnd.apple.pages', 'application/vnd.apple.pages']
+      expect(henkei.metadata['Content-Type']).to eql ['application/vnd.apple.pages', 'application/vnd.apple.pages']
     end
   end
 

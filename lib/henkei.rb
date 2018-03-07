@@ -55,17 +55,17 @@ class Henkei
   #
   def initialize(input)
     if input.is_a? String
-      if File.exists? input
+      if File.exist? input
         @path = input
-      elsif input =~ URI::regexp
+      elsif input =~ URI::DEFAULT_PARSER.make_regexp
         @uri = URI.parse input
       else
-        raise Errno::ENOENT.new "missing file or invalid URI - #{input}"
+        raise Errno::ENOENT, "missing file or invalid URI - #{input}"
       end
     elsif input.respond_to? :read
       @stream = input
     else
-      raise TypeError.new "can't read from #{input.class.name}"
+      raise TypeError, "can't read from #{input.class.name}"
     end
   end
 
@@ -112,7 +112,7 @@ class Henkei
     return @mimetype if defined? @mimetype
 
     type = metadata['Content-Type'].is_a?(Array) ? metadata['Content-Type'].first : metadata['Content-Type']
-    
+
     @mimetype = MIME::Types[type].first
   end
 
@@ -123,11 +123,9 @@ class Henkei
   #
   def creation_date
     return @creation_date if defined? @creation_date
- 
+
     if metadata['Creation-Date']
       @creation_date = Time.parse(metadata['Creation-Date'])
-    else
-      nil
     end
   end
 
@@ -182,19 +180,19 @@ class Henkei
   #
   #  type :html, :text or :metadata
   #  custom_port e.g. 9293
-  #   
+  #
   #  Henkei.server(:text, 9294)
   #
-  def self.server(type, custom_port=nil)
+  def self.server(type, custom_port = nil)
     @@server_port = custom_port || DEFAULT_SERVER_PORT
-    
+
     @@server_pid = Process.spawn tika_command(type, true)
     sleep(2) # Give the server 2 seconds to spin up.
     @@server_pid
   end
 
   # Kills server started by Henkei.server
-  # 
+  #
   #  Always run this when you're done, or else Tika might run until you kill it manually
   #  You might try putting your extraction in a begin..rescue...ensure...end block and
   #    putting this method in the ensure block.
@@ -242,8 +240,8 @@ class Henkei
     s = TCPSocket.new('localhost', @@server_port)
     file = StringIO.new(data, 'r')
 
-    while 1
-      chunk = file.read(65536)
+    loop do
+      chunk = file.read(65_536)
       break unless chunk
       s.write(chunk)
     end
@@ -252,8 +250,8 @@ class Henkei
     s.shutdown(Socket::SHUT_WR)
 
     resp = ''
-    while 1
-      chunk = s.recv(65536)
+    loop do
+      chunk = s.recv(65_536)
       break if chunk.empty? || !chunk
       resp << chunk
     end
