@@ -10,8 +10,9 @@ require 'socket'
 require 'stringio'
 
 class Henkei
-  GEMPATH = File.dirname(File.dirname(__FILE__))
-  JARPATH = File.join(Henkei::GEMPATH, 'jar', 'tika-app-1.17.jar')
+  GEM_PATH = File.dirname(File.dirname(__FILE__))
+  JAR_PATH = File.join(Henkei::GEM_PATH, 'jar', 'tika-app-1.17.jar')
+  CONFIG_PATH = File.join(Henkei::GEM_PATH, 'jar', 'tika-config.xml')
   DEFAULT_SERVER_PORT = 9293 # an arbitrary, but perfectly cromulent, port
 
   @@server_port = nil
@@ -185,21 +186,9 @@ class Henkei
   #  Henkei.server(:text, 9294)
   #
   def self.server(type, custom_port=nil)
-    switch =
-      case type
-      when :text
-        '-t'
-      when :html
-        '-h'
-      when :metadata
-        '-m -j'
-      when :mimetype
-        '-m -j'
-      end
-
     @@server_port = custom_port || DEFAULT_SERVER_PORT
     
-    @@server_pid = Process.spawn("#{java} -Djava.awt.headless=true -jar #{Henkei::JARPATH} --server --port #{@@server_port} #{switch}")
+    @@server_pid = Process.spawn tika_command(type, true)
     sleep(2) # Give the server 2 seconds to spin up.
     @@server_pid
   end
@@ -213,7 +202,7 @@ class Henkei
   #  Henkei.server(:text)
   #  reports = ["report1.docx", "report2.doc", "report3.pdf"]
   #  begin
-  #    my_texts = reports.map{|report_path| Henkei.new(report_path).text }
+  #    my_texts = reports.map{ |report_path| Henkei.new(report_path).text }
   #  rescue
   #  ensure
   #    Henkei.kill_server!
@@ -231,27 +220,15 @@ class Henkei
 
   # Provide the path to the Java binary
   #
-  def self.java
+  def self.java_path
     ENV['JAVA_HOME'] ? ENV['JAVA_HOME'] + '/bin/java' : 'java'
   end
-  private_class_method :java
+  private_class_method :java_path
 
   # Internal helper for calling to Tika library directly
   #
   def self.client_read(type, data)
-    switch =
-      case type
-        when :text
-          '-t'
-        when :html
-          '-h'
-        when :metadata
-          '-m -j'
-        when :mimetype
-          '-m -j'
-      end
-
-    IO.popen "#{java} -Djava.awt.headless=true -jar #{Henkei::JARPATH} #{switch}", 'r+' do |io|
+    IO.popen tika_command(type), 'r+' do |io|
       io.write data
       io.close_write
       io.read
@@ -283,4 +260,25 @@ class Henkei
     resp
   end
   private_class_method :server_read
+
+  # Internal helper for building the Java command to call Tika
+  #
+  def self.tika_command(type, server = false)
+    command = ["#{java_path} -Djava.awt.headless=true -jar #{Henkei::JAR_PATH} --config=#{Henkei::CONFIG_PATH}"]
+    command << "--server --port #{@@server_port}" if server
+    command << switch_for_type(type)
+    command.join ' '
+  end
+
+  # Internal helper for building the Java command to call Tika
+  #
+  def self.switch_for_type(type)
+    case type
+    when :text then '-t'
+    when :html then '-h'
+    when :metadata then '-m -j'
+    when :mimetype then '-m -j'
+    end
+  end
+  private_class_method :switch_for_type
 end

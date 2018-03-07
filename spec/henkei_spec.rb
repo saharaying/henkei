@@ -104,13 +104,13 @@ describe Henkei do
 
   describe '.java' do
     specify 'with no specified JAVA_HOME' do
-      expect( Henkei.send(:java) ).to eql 'java'
+      expect( Henkei.send(:java_path) ).to eql 'java'
     end
 
     specify 'with a specified JAVA_HOME' do
       ENV['JAVA_HOME'] = '/path/to/java/home'
 
-      expect( Henkei.send(:java) ).to eql '/path/to/java/home/bin/java'
+      expect( Henkei.send(:java_path) ).to eql '/path/to/java/home/bin/java'
     end
   end
 
