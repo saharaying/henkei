@@ -9,7 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Erol Fornoles', 'Andrew Bromwich']
   spec.email         = %w[erol.fornoles@gmail.com a.bromwich@gmail.com]
   spec.description   = 'Read text and metadata from files and documents using Apache Tika toolkit'
-  spec.summary       = 'Read text and metadata from files and documents (.doc, .docx, .pages, .odt, .rtf, .pdf) using Apache Tika toolkit'
+  spec.summary       = 'Read text and metadata from files and documents ' \
+                       '(.doc, .docx, .pages, .odt, .rtf, .pdf) using Apache Tika toolkit'
   spec.homepage      = 'http://github.com/abrom/henkei'
   spec.license       = 'MIT'
 

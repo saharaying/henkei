@@ -18,20 +18,24 @@ describe Henkei do
     it 'reads metadata' do
       metadata = Henkei.read :metadata, data
 
-      expect(metadata['Content-Type']).to eql 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      expect(metadata['Content-Type']).to(
+        eq 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      )
     end
 
     it 'reads metadata values with colons as strings' do
       data = File.read 'spec/samples/sample-metadata-values-with-colons.doc'
       metadata = Henkei.read :metadata, data
 
-      expect(metadata['dc:title']).to eql 'problem: test'
+      expect(metadata['dc:title']).to eq 'problem: test'
     end
 
     it 'reads mimetype' do
       mimetype = Henkei.read :mimetype, data
 
-      expect(mimetype.content_type).to eql 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      expect(mimetype.content_type).to(
+        eq 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      )
       expect(mimetype.extensions).to include 'docx'
     end
   end
@@ -103,13 +107,13 @@ describe Henkei do
 
   describe '.java' do
     specify 'with no specified JAVA_HOME' do
-      expect(Henkei.send(:java_path)).to eql 'java'
+      expect(Henkei.send(:java_path)).to eq 'java'
     end
 
     specify 'with a specified JAVA_HOME' do
       ENV['JAVA_HOME'] = '/path/to/java/home'
 
-      expect(Henkei.send(:java_path)).to eql '/path/to/java/home/bin/java'
+      expect(Henkei.send(:java_path)).to eq '/path/to/java/home/bin/java'
     end
   end
 
@@ -121,7 +125,7 @@ describe Henkei do
     end
 
     specify '#metadata reads metadata' do
-      expect(henkei.metadata['Content-Type']).to eql ['application/vnd.apple.pages', 'application/vnd.apple.pages']
+      expect(henkei.metadata['Content-Type']).to eq %w[application/vnd.apple.pages application/vnd.apple.pages]
     end
   end
 
@@ -133,7 +137,9 @@ describe Henkei do
     end
 
     specify '#metadata reads metadata' do
-      expect(henkei.metadata['Content-Type']).to eql 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      expect(henkei.metadata['Content-Type']).to(
+        eq 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      )
     end
   end
 
@@ -145,7 +151,7 @@ describe Henkei do
     end
 
     specify '#metadata reads metadata' do
-      expect(henkei.metadata['Content-Type']).to eql ['application/vnd.apple.pages', 'application/vnd.apple.pages']
+      expect(henkei.metadata['Content-Type']).to eq %w[application/vnd.apple.pages application/vnd.apple.pages]
     end
   end
 
@@ -170,9 +176,15 @@ describe Henkei do
     specify '#runs samples through server mode' do
       begin
         Henkei.server(:text)
-        expect(Henkei.new('spec/samples/sample.pages').text).to include 'The quick brown fox jumped over the lazy cat.'
-        expect(Henkei.new('spec/samples/sample filename with spaces.pages').text).to include 'The quick brown fox jumped over the lazy cat.'
-        expect(Henkei.new('spec/samples/sample.docx').text).to include 'The quick brown fox jumped over the lazy cat.'
+        expect(Henkei.new('spec/samples/sample.pages').text).to(
+          include 'The quick brown fox jumped over the lazy cat.'
+        )
+        expect(Henkei.new('spec/samples/sample filename with spaces.pages').text).to(
+          include 'The quick brown fox jumped over the lazy cat.'
+        )
+        expect(Henkei.new('spec/samples/sample.docx').text).to(
+          include 'The quick brown fox jumped over the lazy cat.'
+        )
       ensure
         Henkei.kill_server!
       end

@@ -9,7 +9,8 @@ require 'json'
 require 'socket'
 require 'stringio'
 
-class Henkei
+# Read text and metadata from files and documents using Apache Tika toolkit
+class Henkei # rubocop:disable Metrics/ClassLength
   GEM_PATH = File.dirname(File.dirname(__FILE__))
   JAR_PATH = File.join(Henkei::GEM_PATH, 'jar', 'tika-app-1.17.jar')
   CONFIG_PATH = File.join(Henkei::GEM_PATH, 'jar', 'tika-config.xml')
@@ -25,17 +26,13 @@ class Henkei
   #   metadata = Henkei.read :metadata, data
   #
   def self.read(type, data)
-    result = @@server_pid ? server_read(type, data) : client_read(type, data)
+    result = @@server_pid ? server_read(data) : client_read(type, data)
 
     case type
-    when :text
-      result
-    when :html
-      result
-    when :metadata
-      JSON.parse(result)
-    when :mimetype
-      MIME::Types[JSON.parse(result)['Content-Type']].first
+    when :text then result
+    when :html then result
+    when :metadata then JSON.parse(result)
+    when :mimetype then MIME::Types[JSON.parse(result)['Content-Type']].first
     end
   end
 
@@ -123,10 +120,8 @@ class Henkei
   #
   def creation_date
     return @creation_date if defined? @creation_date
-
-    if metadata['Creation-Date']
-      @creation_date = Time.parse(metadata['Creation-Date'])
-    end
+    return unless metadata['Creation-Date']
+    @creation_date = Time.parse(metadata['Creation-Date'])
   end
 
   # Returns +true+ if the Henkei document was specified using a file path.
@@ -207,11 +202,11 @@ class Henkei
   #  end
   #
   def self.kill_server!
-    if @@server_pid
-      Process.kill('INT', @@server_pid)
-      @@server_pid = nil
-      @@server_port = nil
-    end
+    return unless @@server_pid
+
+    Process.kill('INT', @@server_pid)
+    @@server_pid = nil
+    @@server_port = nil
   end
 
   ### Private class methods
@@ -236,7 +231,7 @@ class Henkei
 
   # Internal helper for calling to running Tika server
   #
-  def self.server_read(_, data)
+  def self.server_read(data)
     s = TCPSocket.new('localhost', @@server_port)
     file = StringIO.new(data, 'r')
 
