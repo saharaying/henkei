@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Henkei::VERSION
   spec.authors       = ['Erol Fornoles', 'Andrew Bromwich']
   spec.email         = %w[erol.fornoles@gmail.com a.bromwich@gmail.com]
-  spec.description   = %q{Read text and metadata from files and documents (.doc, .docx, .pages, .odt, .rtf, .pdf) using Apache Tika toolkit}
-  spec.summary       = spec.description
+  spec.description   = 'Read text and metadata from files and documents using Apache Tika toolkit'
+  spec.summary       = 'Read text and metadata from files and documents (.doc, .docx, .pages, .odt, .rtf, .pdf) using Apache Tika toolkit'
   spec.homepage      = 'http://github.com/abrom/henkei'
   spec.license       = 'MIT'
 
@@ -18,11 +18,11 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.add_runtime_dependency 'mime-types', '>= 1.23'
-  spec.add_runtime_dependency 'json', '>= 1.8'
+  spec.add_runtime_dependency 'mime-types', '>= 1.23', '< 4'
+  spec.add_runtime_dependency 'json', '>= 1.8', '< 3'
 
   spec.add_development_dependency 'bundler', '~> 1.3'
-  spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'rspec', '~> 3.5'
-  spec.add_development_dependency 'simplecov'
+  spec.add_development_dependency 'rake', '~> 12.3'
+  spec.add_development_dependency 'rspec', '~> 3.7'
+  spec.add_development_dependency 'simplecov', '~> 0.15'
 end
