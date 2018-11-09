@@ -121,6 +121,7 @@ class Henkei # rubocop:disable Metrics/ClassLength
   def creation_date
     return @creation_date if defined? @creation_date
     return unless metadata['Creation-Date']
+
     @creation_date = Time.parse(metadata['Creation-Date'])
   end
 
@@ -238,6 +239,7 @@ class Henkei # rubocop:disable Metrics/ClassLength
     loop do
       chunk = file.read(65_536)
       break unless chunk
+
       s.write(chunk)
     end
 
@@ -248,6 +250,7 @@ class Henkei # rubocop:disable Metrics/ClassLength
     loop do
       chunk = s.recv(65_536)
       break if chunk.empty? || !chunk
+
       resp << chunk
     end
     resp
@@ -262,6 +265,7 @@ class Henkei # rubocop:disable Metrics/ClassLength
     command << switch_for_type(type)
     command.join ' '
   end
+  private_class_method :tika_command
 
   # Internal helper for building the Java command to call Tika
   #
