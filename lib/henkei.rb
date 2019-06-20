@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'henkei/version'
 require 'henkei/yomu'
 
@@ -12,7 +14,7 @@ require 'stringio'
 # Read text and metadata from files and documents using Apache Tika toolkit
 class Henkei # rubocop:disable Metrics/ClassLength
   GEM_PATH = File.dirname(File.dirname(__FILE__))
-  JAR_PATH = File.join(Henkei::GEM_PATH, 'jar', 'tika-app-1.20.jar')
+  JAR_PATH = File.join(Henkei::GEM_PATH, 'jar', 'tika-app-1.21.jar')
   CONFIG_PATH = File.join(Henkei::GEM_PATH, 'jar', 'tika-config.xml')
   DEFAULT_SERVER_PORT = 9293 # an arbitrary, but perfectly cromulent, port
 
@@ -246,7 +248,7 @@ class Henkei # rubocop:disable Metrics/ClassLength
     # tell Tika that we're done sending data
     s.shutdown(Socket::SHUT_WR)
 
-    resp = ''
+    resp = String.new ''
     loop do
       chunk = s.recv(65_536)
       break if chunk.empty? || !chunk
