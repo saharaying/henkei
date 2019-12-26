@@ -40,6 +40,16 @@ describe Henkei do
       )
       expect(mimetype.extensions).to include 'docx'
     end
+
+    context 'when passing in the `pipe-error.png` test file' do
+      let(:data) { File.read 'spec/samples/pipe-error.png' }
+
+      it 'returns an empty result' do
+        text = Henkei.read :text, data
+
+        expect(text).to eq ''
+      end
+    end
   end
 
   describe '.new' do
@@ -128,6 +138,23 @@ describe Henkei do
 
     specify '#metadata reads metadata' do
       expect(henkei.metadata['Content-Type']).to eq %w[application/vnd.apple.pages application/vnd.apple.pages]
+    end
+
+    context 'when passing in the `pipe-error.png` test file' do
+      let(:henkei) { Henkei.new 'spec/samples/pipe-error.png' }
+
+      it '#text returns an empty result' do
+        expect(henkei.text).to eq ''
+      end
+
+      it '#html returns an empty body' do
+        expect(henkei.html).to include '<body/>'
+        expect(henkei.html).to include '<meta name="tiff:ImageWidth" content="792"/>'
+      end
+
+      it '#mimetype returns an empty result' do
+        expect(henkei.mimetype.content_type).to eq 'image/png'
+      end
     end
   end
 

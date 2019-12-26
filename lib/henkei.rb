@@ -11,6 +11,8 @@ require 'json'
 require 'socket'
 require 'stringio'
 
+require 'open3'
+
 # Read text and metadata from files and documents using Apache Tika toolkit
 class Henkei # rubocop:disable Metrics/ClassLength
   GEM_PATH = File.dirname(File.dirname(__FILE__))
@@ -224,11 +226,7 @@ class Henkei # rubocop:disable Metrics/ClassLength
   # Internal helper for calling to Tika library directly
   #
   def self.client_read(type, data)
-    IO.popen tika_command(type), 'r+' do |io|
-      io.write data
-      io.close_write
-      io.read
-    end
+    Open3.capture2(tika_command(type), stdin_data: data).first
   end
   private_class_method :client_read
 
