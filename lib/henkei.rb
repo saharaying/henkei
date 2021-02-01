@@ -2,9 +2,18 @@
 
 require 'henkei/version'
 require 'henkei/yomu'
+require 'henkei/configuration'
 
 require 'net/http'
-require 'mime/types'
+require 'mini_mime'
+
+# require 'mime/types' if available
+begin
+  require 'mime/types'
+rescue LoadError
+  nil
+end
+
 require 'time'
 require 'json'
 
@@ -23,6 +32,18 @@ class Henkei # rubocop:disable Metrics/ClassLength
   @@server_port = nil
   @@server_pid = nil
 
+  def self.mimetype(content_type)
+    if Henkei.configuration.mime_library == 'mime/types' && defined?(MIME::Types)
+      warn '[DEPRECATION] `mime/types` is deprecated. Please use `mini_mime` instead.'\
+        ' Use Henkei.configure and assign "mini_mime" to `mime_library`.'
+      MIME::Types[content_type].first
+    else
+      MiniMime.lookup_by_content_type(content_type).tap do |object|
+        object.define_singleton_method(:extensions) { [extension] }
+      end
+    end
+  end
+
   # Read text or metadata from a data buffer.
   #
   #   data = File.read 'sample.pages'
@@ -36,7 +57,7 @@ class Henkei # rubocop:disable Metrics/ClassLength
     when :text then result
     when :html then result
     when :metadata then JSON.parse(result)
-    when :mimetype then MIME::Types[JSON.parse(result)['Content-Type']].first
+    when :mimetype then Henkei.mimetype(JSON.parse(result)['Content-Type'])
     end
   end
 
@@ -112,9 +133,8 @@ class Henkei # rubocop:disable Metrics/ClassLength
   def mimetype
     return @mimetype if defined? @mimetype
 
-    type = metadata['Content-Type'].is_a?(Array) ? metadata['Content-Type'].first : metadata['Content-Type']
-
-    @mimetype = MIME::Types[type].first
+    content_type = metadata['Content-Type'].is_a?(Array) ? metadata['Content-Type'].first : metadata['Content-Type']
+    @mimetype = Henkei.mimetype(content_type)
   end
 
   # Returns +true+ if the Henkei document was specified using a file path.
